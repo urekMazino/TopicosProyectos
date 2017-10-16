@@ -4,12 +4,13 @@ import java.util.Timer;
 import javax.swing.JPanel;
 
 public class LogicaJuego {
-
+	
+	long gameTime = 0;
 	ArrayList<GameObject> gameObjects = new ArrayList();
 	PanelJuego panel;
 	
 	public void ini(PanelJuego panel){
-		Timer loop = new Timer();
+		 
 		this.panel = panel;
 	}
 
@@ -35,10 +36,11 @@ public class LogicaJuego {
 		       panel.redibujar(gameObjects);
 	       } 
 	       try{
-	            Room.gameTime = (lastLoopTime - System.nanoTime() + OPTIMAL_TIME) / 1000000;
-	            System.out.println(Room.gameTime);
-	            Thread.sleep(Room.gameTime);
+	            gameTime = (lastLoopTime - System.nanoTime() + OPTIMAL_TIME) / 1000000;
+	            System.out.println(gameTime);
+	            Thread.sleep(gameTime);
 	        }catch(Exception e){
 	        }
 	    }
+	}
 }

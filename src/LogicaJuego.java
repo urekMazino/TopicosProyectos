@@ -45,23 +45,38 @@ public class LogicaJuego  implements Runnable{
 		double previousTime = System.nanoTime()/1000000000.0;
 		double deltaTime = 0;
 		double timeCounter = 0;
-
+		double frames=0,renders=0,updates=0;
+		double timeFrames=0;
+		boolean segPaso=true;
 		while (running){
 			render = false;
 			
 			currentTime = System.nanoTime()/1000000000.0;
+			if (segPaso){
+				timeFrames = currentTime;
+				frames=0;
+				updates=0;
+				renders=0;
+				segPaso = false;
+			}
 			deltaTime = currentTime - previousTime;
 			previousTime = currentTime;
 			timeCounter += deltaTime;
-
 			while(timeCounter >= TIME_BETWEEN_FRAMES){
 				timeCounter -= TIME_BETWEEN_FRAMES;
 				render = true;
-				
+				updates++;
+				frames++;
+//				System.out.println(currentTime-timeFrames);
+				if (currentTime-timeFrames>=1){
+					segPaso=true;
+					System.out.println(frames+" , "+ renders+" , "+updates);
+				}
 				updateGame();
 			}
 			if (render){
 				renderGame();
+				renders++;
 			} else {
 				try {
 					Thread.sleep(1);

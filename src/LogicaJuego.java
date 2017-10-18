@@ -9,6 +9,7 @@ public class LogicaJuego  implements Runnable{
 	
 	long gameTime = 0;
 	ArrayList<GameObject> gameObjects = new ArrayList();
+	ArrayList<CollisionInterface> collisionBoxes= new ArrayList();
 	PanelJuego panel;
 	private boolean running = false;
 	private final double TARGET_FPS = 60;
@@ -16,11 +17,18 @@ public class LogicaJuego  implements Runnable{
 	
 	public void ini(PanelJuego panel){
 		PlayerCar car = new PlayerCar();
-		gameObjects.add(new BackgroundGenerator(car));
-		gameObjects.add(car);
+		agregarObjeto(new BackgroundGenerator(car));
+		agregarObjeto(new EnemyCar());
+		agregarObjeto(car);
 		this.panel = panel;
 		Input.setPanel(panel);
 		runGameLoop();
+	}
+	public void agregarObjeto(GameObject obj){
+		gameObjects.add(obj);
+		if (obj instanceof CollisionInterface ){
+			collisionBoxes.add((CollisionInterface)obj);
+		}
 	}
 
 	public void runGameLoop(){
@@ -29,9 +37,22 @@ public class LogicaJuego  implements Runnable{
    }
 	
 	private void updateGame(){
+		
+		for (int i=0;i<collisionBoxes.size();i++){
+			CollisionInterface thisCollision = collisionBoxes.get(i);
+			for (int j=i+1;j<collisionBoxes.size();j++){
+				CollisionInterface otherCollision = collisionBoxes.get(j);
+				if (thisCollision.getCollisionBox().testCollision(otherCollision.getCollisionBox())){
+					thisCollision.collision((GameObject)otherCollision);
+					otherCollision.collision((GameObject)thisCollision);
+				} 
+			}
+		}
+		
 		for (int i=0;i<gameObjects.size();i++){
 			gameObjects.get(i).update();
 		}
+		
 		Input.update();
 	}
 	private void renderGame(){

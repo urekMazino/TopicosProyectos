@@ -18,7 +18,7 @@ public class LogicaJuego  implements Runnable{
 	public void ini(PanelJuego panel){
 		PlayerCar car = new PlayerCar();
 		agregarObjeto(new BackgroundGenerator(car));
-		agregarObjeto(new EnemyCar());
+		agregarObjeto(new EnemyCar(car));
 		agregarObjeto(car);
 		this.panel = panel;
 		Input.setPanel(panel);

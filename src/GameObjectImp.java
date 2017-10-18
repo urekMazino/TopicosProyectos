@@ -16,6 +16,11 @@ public abstract class GameObjectImp implements GameObject{
 		System.out.println("draw!");
 		
 	}
+	
+	@Override
+	public Point2D.Double getPosition(){
+		return position;
+	}
 
 	
 

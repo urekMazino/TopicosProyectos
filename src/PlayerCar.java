@@ -10,9 +10,12 @@ public class PlayerCar extends GameObjectImp implements CollisionInterface{
 
 	private Image img;
 	private double speed = 0,maxSpeed = 200,acceleration = 1;
-	private double moveSpeed = 3.5;
+	private double moveSpeed = 3.5,driftSpeed = 2;
 	private int LIMITE_IZQUIERDO = 166,LIMITE_DERECHO =400;
 	private CollisionBox collisionBox;
+	private boolean hasControl=true,dead=false;
+	private double autoMove = 0;
+	private int frameCounter=0;
 	
 	public PlayerCar(){
 		position.setLocation(247,750);
@@ -27,9 +30,22 @@ public class PlayerCar extends GameObjectImp implements CollisionInterface{
 	
 	@Override
 	public void update(){
-		if (speed<maxSpeed){
+		if (dead)
+			return;
+		if (speed<maxSpeed && hasControl){
 			speed+=acceleration;
 		}
+		if (hasControl){
+			input();
+		} else {
+			updatePositionX(autoMove);
+			frameCounter++;
+			if (frameCounter>30){
+				regainControl();
+			}
+		}
+	}
+	private void input(){
 		if (Input.isKey(KeyEvent.VK_LEFT)){
 			updatePositionX(-moveSpeed);
 		} else if (Input.isKey(KeyEvent.VK_RIGHT)){
@@ -37,7 +53,26 @@ public class PlayerCar extends GameObjectImp implements CollisionInterface{
 		}
 	}
 	private void updatePositionX(double x){
-		position.setLocation(Math.min(LIMITE_DERECHO,Math.max(LIMITE_IZQUIERDO, position.getX()+x)),position.getY());
+		if (position.x>LIMITE_DERECHO){
+			position.setLocation(LIMITE_DERECHO,position.getY());
+			if (!hasControl){
+				explode();
+			}
+
+		} else if (position.x<LIMITE_IZQUIERDO){
+			position.setLocation(LIMITE_IZQUIERDO,position.getY());
+			if (!hasControl){
+				explode();
+			}
+
+		} else {
+			position.setLocation(position.getX()+x,position.getY());
+
+		}
+	}
+	public void explode(){
+		speed = 0;
+		dead= true;
 	}
 	@Override
 	public void draw(Graphics g){
@@ -51,8 +86,25 @@ public class PlayerCar extends GameObjectImp implements CollisionInterface{
 
 	@Override
 	public void collision(GameObject other) {
-		// TODO Auto-generated method stub
-		
+		if (other instanceof EnemyCar)
+			crash((EnemyCar)other);
+	}
+	
+	public void crash(EnemyCar other){
+		if (other.getPosition().getX()>this.position.getX()){
+			autoMove=-driftSpeed;
+		} else {
+			autoMove=driftSpeed;
+		}
+		hasControl = false;
+		speed = other.getSpeed();
+	}
+	
+	private void regainControl(){
+		hasControl = true;
+		autoMove = 0;
+		frameCounter =0 ;
+		speed = maxSpeed;
 	}
 	@Override
 	public CollisionBox getCollisionBox(){

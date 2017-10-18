@@ -7,10 +7,14 @@ import javax.swing.ImageIcon;
 public class EnemyCar extends GameObjectImp implements CollisionInterface{
 
 	private Image img;
-	private double speed=5;
+	private double deltaY=0;
+	private double speed=80,driftSpeed =1.5,autoMove=0;
+	private int driftCounter=0;
+	private boolean drifting=false;
 	private CollisionBox collisionBox;
+	private PlayerCar playerCar;
 	
-	public EnemyCar(){
+	public EnemyCar(PlayerCar playerCar){
 		position.setLocation(247,0);
 		try{
 			img = new ImageIcon("res/carro-enemigo-amarillo.png").getImage();
@@ -18,13 +22,22 @@ public class EnemyCar extends GameObjectImp implements CollisionInterface{
 			e.printStackTrace();
 		}
 		collisionBox = new CollisionBox(position,img.getWidth(null),img.getHeight(null));
+		this.playerCar = playerCar;
 	}
 	
 	public void update(){
-		position.setLocation(position.getX(),position.getY()+speed);
-		if (position.getY()>1000){
+		position.setLocation(position.getX(),position.getY()+(playerCar.getSpeed()-speed)/10);
+		if (position.getY()>1000 || position.getY()<0){
 			position.setLocation(position.getX(), 0);
 		}
+		if (drifting){
+			driftCounter++;
+			position.setLocation(position.getX()+autoMove,position.getY());
+			if (driftCounter>30){
+				stabilize();
+			}
+		}
+		deltaY = position.getY();
 	}
 	
 	
@@ -36,7 +49,24 @@ public class EnemyCar extends GameObjectImp implements CollisionInterface{
 
 	@Override
 	public void collision(GameObject other) {
-		System.out.println("Oh shit");
+		position.setLocation(position.getX(),deltaY);
+		crash();
+	}
+	public void crash(){
+		if (playerCar.getPosition().getX()>this.position.getX()){
+			autoMove=-driftSpeed;
+		} else {
+			autoMove=driftSpeed;
+		}
+		drifting = true;
+		driftCounter=0;
+	}
+	private void stabilize(){
+		drifting = false;
+		autoMove = 0;
+	}
+	public double getSpeed(){
+		return speed;
 	}
 
 	@Override

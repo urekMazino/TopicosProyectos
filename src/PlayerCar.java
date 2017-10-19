@@ -8,7 +8,8 @@ import javax.swing.ImageIcon;
 
 public class PlayerCar extends GameObjectImp implements CollisionInterface{
 
-	private Image img;
+	private Animation mainAnim,driftingRightAnim,driftingLeftAnim,explosionAnim;
+	private SpriteManager spriteManager = new SpriteManager();
 	private double speed = 0,maxSpeed = 200,acceleration = 1;
 	private double moveSpeed = 3.5,driftSpeed = 2;
 	private int LIMITE_IZQUIERDO = 166,LIMITE_DERECHO =400;
@@ -20,16 +21,24 @@ public class PlayerCar extends GameObjectImp implements CollisionInterface{
 	public PlayerCar(){
 		position.setLocation(247,750);
 		try{
-			img = new ImageIcon("res/carrito.png").getImage();
+			mainAnim = new Animation("res/carrito.png");
+			driftingRightAnim =  new Animation("res/drift-right.png");
+			driftingLeftAnim =  new Animation("res/drift-left.png");
+			explosionAnim = new Animation("res/explosion1.png","res/explosion2.png","res/explosion3.png");
+			explosionAnim.setRepeat(false);
+			spriteManager.changeSprite(mainAnim);
+			
 		}catch (Exception e){
 			e.printStackTrace();
 		}
-		collisionBox = new CollisionBox(position,img.getWidth(null),img.getHeight(null));
+		collisionBox = new CollisionBox(position,spriteManager.getCurrentFrame().getWidth(null),spriteManager.getCurrentFrame().getHeight(null));
 		collisionBox.width = collisionBox.width-10;
 	}
 	
 	@Override
 	public void update(){
+		spriteManager.update();
+
 		if (dead)
 			return;
 		if (speed<maxSpeed && hasControl){
@@ -72,11 +81,13 @@ public class PlayerCar extends GameObjectImp implements CollisionInterface{
 	}
 	public void explode(){
 		speed = 0;
-		dead= true;
+		dead = true;
+		spriteManager.changeSprite(explosionAnim);
+		System.out.println("1");
 	}
 	@Override
 	public void draw(Graphics g){
-		g.drawImage(img, (int)position.getX(), (int)position.getY(), null);
+		spriteManager.draw(g, (int)position.getX(), (int)position.getY());
 		g.drawRect((int)position.getX(), (int)position.getY(), collisionBox.width, collisionBox.height);
 
 	}
@@ -93,11 +104,14 @@ public class PlayerCar extends GameObjectImp implements CollisionInterface{
 	public void crash(EnemyCar other){
 		if (other.getPosition().getX()>this.position.getX()){
 			autoMove=-driftSpeed;
+			spriteManager.changeSprite(driftingLeftAnim);
 		} else {
 			autoMove=driftSpeed;
+			spriteManager.changeSprite(driftingRightAnim);
 		}
 		hasControl = false;
 		speed = other.getSpeed();
+		System.out.println("2");
 	}
 	
 	private void regainControl(){
@@ -105,6 +119,8 @@ public class PlayerCar extends GameObjectImp implements CollisionInterface{
 		autoMove = 0;
 		frameCounter =0 ;
 		speed = maxSpeed;
+		spriteManager.changeSprite(mainAnim);
+
 	}
 	@Override
 	public CollisionBox getCollisionBox(){

@@ -6,7 +6,7 @@ import javax.swing.ImageIcon;
 
 public class EnemyCar extends GameObjectImp implements CollisionInterface{
 
-	private Image img;
+	private Image currentImage;
 	private double deltaY=0;
 	private double speed=80,driftSpeed =1.5,autoMove=0;
 	private int driftCounter=0;
@@ -17,11 +17,12 @@ public class EnemyCar extends GameObjectImp implements CollisionInterface{
 	public EnemyCar(PlayerCar playerCar){
 		position.setLocation(247,0);
 		try{
-			img = new ImageIcon("res/carro-enemigo-amarillo.png").getImage();
+			currentImage = new ImageIcon("res/carro-enemigo-amarillo.png").getImage();
+
 		}catch (Exception e){
 			e.printStackTrace();
 		}
-		collisionBox = new CollisionBox(position,img.getWidth(null),img.getHeight(null));
+		collisionBox = new CollisionBox(position,currentImage.getWidth(null),currentImage.getHeight(null));
 		this.playerCar = playerCar;
 	}
 	
@@ -42,7 +43,7 @@ public class EnemyCar extends GameObjectImp implements CollisionInterface{
 	
 	
 	public void draw(Graphics g){
-		g.drawImage(img, (int)position.getX(), (int) position.getY(), null);
+		g.drawImage(currentImage, (int)position.getX(), (int) position.getY(), null);
 		g.setColor(Color.RED);
 		g.drawRect((int)position.getX(), (int)position.getY(), collisionBox.width, collisionBox.height);
 	}

@@ -6,9 +6,9 @@ import javax.swing.ImageIcon;
 
 public class EnemyCar extends GameObjectImp implements CollisionInterface{
 
-	private Animation currentAnim,explosionAnim;
+	protected Animation currentAnim,explosionAnim;
 	private int LIMITE_IZQUIERDO = 166,LIMITE_DERECHO =400;
-	private SpriteManager spriteManager = new SpriteManager();
+	protected SpriteManager spriteManager = new SpriteManager();
 	private double deltaY=0;
 	private double speed=80,driftSpeed =1.5,autoMove=0;
 	private int driftCounter=0;

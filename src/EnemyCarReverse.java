@@ -5,6 +5,8 @@ public class EnemyCarReverse extends EnemyCar{
 	
 	public EnemyCarReverse(PlayerCar playerCar) {
 		super(playerCar);
+		currentAnim = new Animation("res/carro-enemigo-amarillo-reverso.png");
+		spriteManager.changeSprite(currentAnim);
 	}
 
 	@Override

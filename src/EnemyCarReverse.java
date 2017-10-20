@@ -15,14 +15,23 @@ public class EnemyCarReverse extends EnemyCar{
 
 	}
 	@Override
-	public void crash(){
-		super.crash();
+	public void crash(GameObject other){
+		super.crash(other);
 		speed=0;
+	}
+	
+	@Override
+	public void collision(GameObject other){
+		if (other instanceof PlayerCar || other instanceof EnemyCarNormal){
+			crash(other);
+		} 
 	}
 	@Override
 	protected void stabilize(){
 		super.stabilize();
 		speed =200;
 	}
+	
+	
 	
 }

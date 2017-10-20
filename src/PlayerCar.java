@@ -10,13 +10,14 @@ public class PlayerCar extends GameObjectImp implements CollisionInterface{
 
 	private Animation mainAnim,driftingRightAnim,driftingLeftAnim,explosionAnim;
 	private SpriteManager spriteManager = new SpriteManager();
-	private double speed = 0,maxSpeed = 200,acceleration = 1;
+	private double speed = 0,maxSpeed = 200,acceleration = 1,deltaY=0;;
 	private double moveSpeed = 3.5,driftSpeed = 2;
 	private int LIMITE_IZQUIERDO = 166,LIMITE_DERECHO =400;
 	private CollisionBox collisionBox;
 	private boolean hasControl=true,dead=false;
 	private double autoMove = 0;
 	private int frameCounter=0,gasolina=100,gasolinaCounter=0,gasolinaSpeedLose=30;
+	private double distancia =0;
 	
 	public PlayerCar(){
 		position.setLocation(247,750);
@@ -34,20 +35,50 @@ public class PlayerCar extends GameObjectImp implements CollisionInterface{
 		collisionBox = new CollisionBox(position,spriteManager.getCurrentFrame().getWidth(null),spriteManager.getCurrentFrame().getHeight(null));
 		collisionBox.width = collisionBox.width-10;
 	}
-	
+	public boolean isDead(){
+		return dead;
+	}
+	public double getDistancia(){
+		return distancia;
+	}
+	public void setDistancia(double distancia){
+		this.distancia=distancia;
+	}
+	private void distanceAcumulator(){
+		distancia+=speed;
+	}
+	public void addGasolina(int extra){
+		this.gasolina += extra;
+		if (gasolina>100){
+			gasolina = 100;
+		}
+	}
+	public int getGasolina(){
+		return gasolina;
+	}
 	private void reduceGasoline(){
 		if (gasolinaCounter++==gasolinaSpeedLose){
 			gasolina--;
 			gasolinaCounter=0;
-			System.out.println(gasolina);
+		}
+	}
+	private void checkFuel(){
+		if (gasolina<=0){
+			dead=true;
 		}
 	}
 	@Override
 	public void update(){
 		spriteManager.update();
 
-		if (dead)
+		if (dead==true){
+			if (spriteManager.getAnimation().getEnded()){
+				controller.gameOver();
+			}
 			return;
+		} 
+		deltaY = position.getY();
+
 		if (speed<maxSpeed && hasControl){
 			speed+=acceleration;
 		}
@@ -61,6 +92,8 @@ public class PlayerCar extends GameObjectImp implements CollisionInterface{
 				regainControl();
 			}
 		}
+		distanceAcumulator();
+		checkFuel();
 	}
 	private void input(){
 		if (Input.isKey(KeyEvent.VK_LEFT)){
@@ -104,11 +137,16 @@ public class PlayerCar extends GameObjectImp implements CollisionInterface{
 
 	@Override
 	public void collision(GameObject other) {
-		if (other instanceof EnemyCar)
+		if (other instanceof Gasolina){
+			addGasolina(50);
+		} else {
 			crash((EnemyCar)other);
+
+		}
 	}
 	
 	public void crash(EnemyCar other){
+		position.setLocation(position.getX(),deltaY);
 		if (other.getPosition().getX()>this.position.getX()){
 			autoMove=-driftSpeed;
 			spriteManager.changeSprite(driftingLeftAnim);

@@ -3,6 +3,7 @@ import java.awt.event.KeyListener;
 import java.util.ArrayList;
 import java.util.Timer;
 
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 public class LogicaJuego  implements Runnable{
@@ -16,13 +17,33 @@ public class LogicaJuego  implements Runnable{
 	private final double TIME_BETWEEN_FRAMES = 1/TARGET_FPS;
 	
 	public void ini(PanelJuego panel){
-		PlayerCar car = new PlayerCar();
-		agregarObjeto(new BackgroundGenerator(car));
-		agregarObjeto(new GeneradorCarros(car));
-		agregarObjeto(car);
+		iniObjects();
 		this.panel = panel;
 		Input.setPanel(panel);
 		runGameLoop();
+	}
+	public void gameOver(){
+		int response = JOptionPane.showConfirmDialog(null, "Perdiste, quieres jugar de nuevo?", "Fierro",
+		        JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+		    if (response == JOptionPane.NO_OPTION) {
+		    	System.exit(0);
+		    } else if (response == JOptionPane.YES_OPTION) {
+				restart();
+		    } else if (response == JOptionPane.CLOSED_OPTION) {
+		    	System.exit(0);
+		    }
+	}
+	public void iniObjects(){
+		PlayerCar car = new PlayerCar();
+		agregarObjeto(new BackgroundGenerator(car));
+		agregarObjeto(new GeneradorCarros(car));
+		agregarObjeto(new GasScore(car));
+		agregarObjeto(car);
+	}
+	public void restart(){
+		gameObjects.clear();
+		collisionBoxes.clear();
+		iniObjects();
 	}
 	public void agregarObjeto(GameObject obj){
 		gameObjects.add(obj);

@@ -39,13 +39,16 @@ public class EnemyCar extends GameObjectImp implements CollisionInterface{
 		spriteManager.update();
 		if (dead==true){
 			if (spriteManager.getAnimation().getEnded()){
-				System.out.println("deaddddd");
 				this.destroy();
 			}
 		} 
-		
+		if (playerCar.isDead()){
+			return;
+		}
+		deltaY = position.getY();
+
 		goDown();
-		if (position.getY()>1000 || position.getY()<-40){
+		if (position.getY()>1000 || position.getY()<-120){
 			destroy();
 		}
 		
@@ -56,7 +59,6 @@ public class EnemyCar extends GameObjectImp implements CollisionInterface{
 				stabilize();
 			}
 		}
-		deltaY = position.getY();
 	}
 	public void goDown(){
 		position.setLocation(position.getX(),position.getY()+(playerCar.getSpeed()-speed)/10);
@@ -96,10 +98,10 @@ public class EnemyCar extends GameObjectImp implements CollisionInterface{
 	@Override
 	public void collision(GameObject other) {
 		position.setLocation(position.getX(),deltaY);
-		crash();
+		crash(other);
 	}
-	public void crash(){
-		if (playerCar.getPosition().getX()>this.position.getX()){
+	public void crash(GameObject other){
+		if (other.getPosition().getX()>this.position.getX()){
 			autoMove=-driftSpeed;
 		} else {
 			autoMove=driftSpeed;

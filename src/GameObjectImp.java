@@ -6,14 +6,18 @@ public abstract class GameObjectImp implements GameObject{
 
 	protected CollisionBox collisionBox;
 	protected Point2D.Double position = new Point.Double(247,850);
+	private LogicaJuego controller;
 	
 	@Override
 	public void update() {
 	}
 
+	public void addController(LogicaJuego controller){
+		this.controller = controller;
+	}
+	
 	@Override
 	public void draw(Graphics g) {
-		System.out.println("draw!");
 		
 	}
 	
@@ -21,8 +25,12 @@ public abstract class GameObjectImp implements GameObject{
 	public Point2D.Double getPosition(){
 		return position;
 	}
-
-	
+	public void destroy(){
+		controller.deleteObject(this);
+	}
+	public void instantiate(GameObject obj){
+		controller.agregarObjeto(obj);
+	}
 
 	
 }

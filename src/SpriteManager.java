@@ -8,7 +8,6 @@ public class SpriteManager {
 	public void update(){
 		if (counter>=animation.speed){
 			animation.next();
-			System.out.println("CHANGE");
 			counter=0;
 		}
 		counter++;
@@ -21,6 +20,9 @@ public class SpriteManager {
 	public  void changeSprite(Animation animation){
 		this.animation = animation;
 		counter=0;
+	}
+	public Animation getAnimation(){
+		return animation;
 	}
 	
 	public Image getCurrentFrame(){

@@ -6,48 +6,93 @@ import javax.swing.ImageIcon;
 
 public class EnemyCar extends GameObjectImp implements CollisionInterface{
 
-	private Image currentImage;
+	private Animation currentAnim,explosionAnim;
+	private int LIMITE_IZQUIERDO = 166,LIMITE_DERECHO =400;
+	private SpriteManager spriteManager = new SpriteManager();
 	private double deltaY=0;
 	private double speed=80,driftSpeed =1.5,autoMove=0;
 	private int driftCounter=0;
-	private boolean drifting=false;
+	private boolean drifting=false,dead = false;
 	private CollisionBox collisionBox;
 	private PlayerCar playerCar;
 	
 	public EnemyCar(PlayerCar playerCar){
 		position.setLocation(247,0);
 		try{
-			currentImage = new ImageIcon("res/carro-enemigo-amarillo.png").getImage();
+			currentAnim = new Animation("res/carro-enemigo-amarillo.png");
+			explosionAnim = new Animation("res/explosion1.png","res/explosion2.png","res/explosion3.png");
+			explosionAnim.setRepeat(false);
+			spriteManager.changeSprite(currentAnim);
 
 		}catch (Exception e){
 			e.printStackTrace();
 		}
-		collisionBox = new CollisionBox(position,currentImage.getWidth(null),currentImage.getHeight(null));
+		collisionBox = new CollisionBox(position,spriteManager.getCurrentFrame().getWidth(null),spriteManager.getCurrentFrame().getHeight(null));
 		this.playerCar = playerCar;
 	}
 	
+	public void setSpeed(double speed){
+		this.speed  =speed;
+	}
+	
 	public void update(){
-		position.setLocation(position.getX(),position.getY()+(playerCar.getSpeed()-speed)/10);
-		if (position.getY()>1000 || position.getY()<0){
-			position.setLocation(position.getX(), 0);
+		spriteManager.update();
+		if (dead==true){
+			if (spriteManager.getAnimation().getEnded()){
+				System.out.println("deaddddd");
+				this.destroy();
+			}
+		} 
+		
+		goDown();
+		if (position.getY()>1000 || position.getY()<-40){
+			destroy();
 		}
+		
 		if (drifting){
 			driftCounter++;
-			position.setLocation(position.getX()+autoMove,position.getY());
+			updatePositionX(autoMove);
 			if (driftCounter>30){
 				stabilize();
 			}
 		}
 		deltaY = position.getY();
 	}
-	
+	public void goDown(){
+		position.setLocation(position.getX(),position.getY()+(playerCar.getSpeed()-speed)/10);
+	}
 	
 	public void draw(Graphics g){
-		g.drawImage(currentImage, (int)position.getX(), (int) position.getY(), null);
+		spriteManager.draw(g, (int)position.getX(), (int) position.getY());
 		g.setColor(Color.RED);
 		g.drawRect((int)position.getX(), (int)position.getY(), collisionBox.width, collisionBox.height);
 	}
 
+	public void explode(){
+		speed = 0;
+		dead = true;
+		spriteManager.changeSprite(explosionAnim);
+	}
+	
+	private void updatePositionX(double x){
+		if (position.x>LIMITE_DERECHO){
+			position.setLocation(LIMITE_DERECHO,position.getY());
+			if (drifting){
+				explode();
+			}
+
+		} else if (position.x<LIMITE_IZQUIERDO){
+			position.setLocation(LIMITE_IZQUIERDO,position.getY());
+			if (drifting){
+				explode();
+			}
+
+		} else {
+			position.setLocation(position.getX()+x,position.getY());
+
+		}
+	}
+	
 	@Override
 	public void collision(GameObject other) {
 		position.setLocation(position.getX(),deltaY);
@@ -62,7 +107,7 @@ public class EnemyCar extends GameObjectImp implements CollisionInterface{
 		drifting = true;
 		driftCounter=0;
 	}
-	private void stabilize(){
+	protected void stabilize(){
 		drifting = false;
 		autoMove = 0;
 	}

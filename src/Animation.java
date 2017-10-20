@@ -14,6 +14,7 @@ public class Animation {
 			frames[i] = new ImageIcon(imagenes[i]).getImage();
 		}
 	}
+	
 	public void next(){
 		index++;
 		if (index>=frames.length){
@@ -24,11 +25,18 @@ public class Animation {
 			}
 		}
 	}
+	
+	public void setSpeed(int speed){
+		this.speed = speed;
+	}
 	public void draw(Graphics g, int x, int y){
 		if (!ended)
 			g.drawImage(frames[index], x,y,null);
 	}
 	public void setRepeat(boolean repeat){
 		this.repeat = repeat;
+	}
+	public boolean getEnded(){
+		return ended;
 	}
 }

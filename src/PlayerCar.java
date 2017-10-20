@@ -16,7 +16,7 @@ public class PlayerCar extends GameObjectImp implements CollisionInterface{
 	private CollisionBox collisionBox;
 	private boolean hasControl=true,dead=false;
 	private double autoMove = 0;
-	private int frameCounter=0;
+	private int frameCounter=0,gasolina=100,gasolinaCounter=0,gasolinaSpeedLose=30;
 	
 	public PlayerCar(){
 		position.setLocation(247,750);
@@ -35,6 +35,13 @@ public class PlayerCar extends GameObjectImp implements CollisionInterface{
 		collisionBox.width = collisionBox.width-10;
 	}
 	
+	private void reduceGasoline(){
+		if (gasolinaCounter++==gasolinaSpeedLose){
+			gasolina--;
+			gasolinaCounter=0;
+			System.out.println(gasolina);
+		}
+	}
 	@Override
 	public void update(){
 		spriteManager.update();
@@ -44,6 +51,7 @@ public class PlayerCar extends GameObjectImp implements CollisionInterface{
 		if (speed<maxSpeed && hasControl){
 			speed+=acceleration;
 		}
+		reduceGasoline();
 		if (hasControl){
 			input();
 		} else {
@@ -83,7 +91,6 @@ public class PlayerCar extends GameObjectImp implements CollisionInterface{
 		speed = 0;
 		dead = true;
 		spriteManager.changeSprite(explosionAnim);
-		System.out.println("1");
 	}
 	@Override
 	public void draw(Graphics g){
@@ -111,7 +118,6 @@ public class PlayerCar extends GameObjectImp implements CollisionInterface{
 		}
 		hasControl = false;
 		speed = other.getSpeed();
-		System.out.println("2");
 	}
 	
 	private void regainControl(){

@@ -18,7 +18,7 @@ public class LogicaJuego  implements Runnable{
 	public void ini(PanelJuego panel){
 		PlayerCar car = new PlayerCar();
 		agregarObjeto(new BackgroundGenerator(car));
-		agregarObjeto(new EnemyCar(car));
+		agregarObjeto(new GeneradorCarros(car));
 		agregarObjeto(car);
 		this.panel = panel;
 		Input.setPanel(panel);
@@ -26,11 +26,15 @@ public class LogicaJuego  implements Runnable{
 	}
 	public void agregarObjeto(GameObject obj){
 		gameObjects.add(obj);
+		obj.addController(this);
 		if (obj instanceof CollisionInterface ){
 			collisionBoxes.add((CollisionInterface)obj);
 		}
 	}
-
+	public void deleteObject(GameObject obj){
+		gameObjects.remove(obj);
+		collisionBoxes.remove(obj);
+	}
 	public void runGameLoop(){
       Thread loop = new Thread(this);
       loop.start();
